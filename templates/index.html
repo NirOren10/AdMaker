@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+<form action="/" method="post">
+  {% for q in questions %}
+  <h3>{{q}}</h3>
+   
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="{{q}}1" placeholder="" type="text">
+        </div>
+    
+      <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="{{q}}2" placeholder="" type="text">
+      </div>
+  
+    <div class="form-group">
+        <input autocomplete="off" autofocus class="form-control" name="{{q}}3" placeholder="" type="text">
+    </div>
+
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">submit</button>
+  </form>
+{% endblock %}

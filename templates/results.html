@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    nope
+{% endblock %}
+
+{% block main %}
+    <div>
+        {{txt}}
+    </div>
+    {% for r in results %}
+        <h3>{{r[0]}}</h3>
+        {% for a in r[1]%}
+            <h4>{{a[0]}} : {{a[1]}}</h4>
+        {%endfor%}
+    {% endfor %}
+    
+{% endblock %}

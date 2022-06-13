@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    par
+{% endblock %}
+
+{% block main %}
+    <form action="/paragraph" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="txt" placeholder="txt" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">enter</button>
+    </form>
+{% endblock %}
