@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    nope
+{% endblock %}
+
+{% block main %}
+    <div style="float:left; border-radius:15px;
+    background-color: lightblue;
+    text-align: center;
+    height:30em;width:70%;padding:5px;margin:5px";>
+        <h1>nonononobrainer</h1>
+    </div>
+    <div style="float:right;border-radius:15px;
+    background-color: lightblue;
+    text-align: center;
+    height:auto;width:28%;padding:5px;margin:5px;text-align:left;";>
+    {% for r in questions %}
+        <h3 style="margin-left:1em;">hhh</h3>
+        {% for a in range(3)%}
+            <h4 style="margin-left:2em;">lol sub</h4>    
+        {%endfor%}
+    {% endfor %}
+    </div>
+{% endblock %}

@@ -5,13 +5,19 @@
 {% endblock %}
 
 {% block main %}
-    <div>
-        {{txt}}
-    </div>
+<div style="float:left; border-radius:15px;
+background-color: lightblue;
+text-align: center;
+height:30em;width:70%;padding:5px;margin:5px";>
+        <h3>{{txt}}</h3>
+        <div style="float:right;border-radius:15px;
+        background-color: lightblue;
+        text-align: center;
+        height:auto;width:28%;padding:5px;margin:5px;text-align:left;";>
     {% for r in results %}
-        <h3>{{r[0]}}</h3>
+    <h3 style="margin-left:1em;">{{r[0]}}</h3>
         {% for a in r[1]%}
-            <h4>{{a[0]}} : {{a[1]}}</h4>
+        <h4 style="margin-left:2em;">{{a[0]}} : {{a[1]}}</h4>
         {%endfor%}
     {% endfor %}
     

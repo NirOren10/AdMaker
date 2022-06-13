@@ -11,8 +11,13 @@ from helpers import apology, login_required, lookup, usd
 
 
 questions = [
-    'what is special?',
-    'signiture product?'
+    ['מה הוואו פקטור שלך- עד 5 וקח זמן לחשוב',5],
+    ['שלושה מתחרים.',3],
+    ['מה היתרונות של המתחרים שלך',3],
+    ['מה החסרונות של המתחרים שלך',3],
+    ['מה היתרונות שלך לעומתם- איפה אתה טוב יותר',3],
+    ['מה הכי היית רוצה שידעו עלייך',3],
+    ['האם לקהל ספציפי או יותר רחב',1]
 ]
 
 # Configure application
@@ -53,8 +58,8 @@ def index():
         
         for q in questions:
             temp = []
-            for i in range(3):
-                val = request.form.get(str(q)+str(i+1))
+            for i in range(q[1]):
+                val = request.form.get(str(q[0])+str(i))
                 if val != "":
                     temp.append(val)
                 #print(val)
@@ -199,7 +204,7 @@ def results():
         flash("Sold!")
         return redirect("/results")
     else:
-        return render_template("results.html")
+        return render_template("testy.html", questions = questions)
  
 
 txt = ''
@@ -216,14 +221,7 @@ def paragraph():
             temp = []
             for a in answers[i]:
                 temp.append([a,txt.count(a)])
-            results.append([questions[i],temp])
-        print(results)
-        '''for i in range(len(results)):
-            temp = []
-            for k in range(len(results[i])):
-                temp.append(f'{answers[i][k]} : {results[i][k]}')
-            final.append(temp)
-        print(final)'''
+            results.append([questions[i][0],temp])
         return render_template('results.html', results = results, txt=txt,questions = questions)
     else:
         return render_template("paragraph.html")
