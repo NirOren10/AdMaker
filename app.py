@@ -50,7 +50,7 @@ answers = []
 
 
 @app.route("/", methods=["GET", "POST"])
-#@login_required
+@login_required
 def index():
     global answers
     answers = []
@@ -84,29 +84,27 @@ def login():
         ERROR = ' '
         # Ensure username was submitted
         if not request.form.get("email"):
-            ERROR ="must provide email"
-            return render_template("login.html", ERROR=ERROR)
+            flash("must provide email")
+            return render_template("login.html")
             #return apology("must provide username", 403)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            ERROR ="must provide password"
-            return render_template("login.html", ERROR=ERROR)
+            flash("must provide password")
+            return render_template("login.html")
             #return apology("must provide password", 403)
-        if "." not in request.form.get("email") or "@" not in request.form.get("email"):
-            ERROR ="invalid email address"
-            return render_template("login.html", ERROR=ERROR)
+
         # Query database for username
-        '''rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("email"))
+        rows = db.execute("SELECT * FROM users WHERE email = ?", request.form.get("email"))
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            ERROR ="invalid username and/or password"
-            return render_template("login.html", ERROR=ERROR)
+            flash("invalid email and/or password")
+            return render_template("login.html")
             #return apology("invalid username and/or password", 403)
-        '''
+
         # Remember which user has logged in
-        session["user_id"] = 1
+        session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
         return redirect("/")
@@ -129,75 +127,64 @@ def logout():
 
 
 
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         ERROR = ' '
-        email = request.form.get('email')
+        username = request.form.get('email')
         password = request.form.get('password')
         repassword = request.form.get('confirmation')
-        name = request.form.get('name')
-        phone = request.form.get('phone')
+        email = request.form.get('email')
+
         if not request.form.get("email"):
             ERROR = "must provide email"
             return render_template("register.html", ERROR=ERROR)
 
             #return apology("must provide username", 400)
-        if "." not in request.form.get("email") or "@" not in request.form.get("email"):
-            ERROR ="invalid email address"
-            return render_template("register.html",  ERROR=ERROR)
+
         # Ensure password was submitted
         elif not request.form.get("password"):
             ERROR = "must provide password"
-            return render_template("register.html",  ERROR=ERROR)
+            flash('retype passwords')
+            return render_template("register.html", ERROR=ERROR)
             #return apology("must provide password", 400)
 
         elif request.form.get("confirmation") is None:
             ERROR ="must retype password"
+            flash('retype passwords')
             return render_template("register.html", ERROR=ERROR)
             #return apology("must retype password", 400)
 
-
-        elif name is None:
-            ERROR ="must provide name"
-            return render_template("register.html", ERROR=ERROR)
-            #return apology("must provide name", 400)
-
-
-
         if password != repassword:
             ERROR ="passwords dont match"
+            flash('passwords dont match')
             return render_template("register.html", ERROR=ERROR)
             #return apology("passwords dont match", 400)
         # Ensure username exists and password is correct
+
         rows = db.execute("SELECT * FROM users WHERE email = ?", email)
         if len(rows) != 0:
             ERROR ="email exists in system"
+            flash('email exists')
             return render_template("register.html", ERROR=ERROR)
             #return apology("Username exists in system", 400)
 
         else:
             hashed_password = generate_password_hash(password)
-            db.execute('INSERT INTO users (email, hash, name, phone) VALUES(? , ?,?,?)',
-            email,
-            hashed_password,
-            name,
-            phone)
-
+            db.execute('INSERT INTO users (email, hash) VALUES(? , ?)',
+            username,
+            hashed_password)
             return redirect('/')
 
     else:
-        return render_template("register.html", )
-
-    # return apology("TODO")
+        return render_template("register.html")
 
 
 
 
 
 @app.route("/results", methods=["GET", "POST"])
-#@login_required
+@login_required
 def results():
     global txt
     if request.method == "POST":
@@ -210,7 +197,7 @@ def results():
 txt = ''
 
 @app.route("/paragraph", methods=["GET", "POST"])
-#@login_required
+@login_required
 def paragraph():
     results = []
     global txt
@@ -220,7 +207,11 @@ def paragraph():
         for i in range(len(answers)):
             temp = []
             for a in answers[i]:
-                temp.append([a,txt.count(a)])
+                if txt.count(a) > 0:
+                    temp.append([a,txt.count(a)])
+                else:
+                    print(a, 0)
+                    temp.append([a,f'<span style="color: #ff0000">{txt.count(a)}</span>'])
             results.append([questions[i][0],temp])
         return render_template('results.html', results = results, txt=txt,questions = questions)
     else:
