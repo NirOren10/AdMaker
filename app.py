@@ -1,25 +1,15 @@
 import os
 import datetime
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session, Response
+from flask import Flask, flash, redirect, render_template, request, session, json
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+# from django.utils import simplejson
+
 
 from helpers import apology, login_required, lookup, usd
-
-
-questions = [
-    ['מה הוואו פקטור שלך- עד 5 וקח זמן לחשוב',5],
-    ['שלושה מתחרים.',3],
-    ['מה היתרונות של המתחרים שלך',3],
-    ['מה החסרונות של המתחרים שלך',3],
-    ['מה היתרונות שלך לעומתם- איפה אתה טוב יותר',3],
-    ['מה הכי היית רוצה שידעו עלייך',3],
-    ['האם לקהל ספציפי או יותר רחב',1],
-    ['test question',2]
-]
 
 # Configure application
 app = Flask(__name__)
@@ -31,7 +21,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Cache-Control"] = "no-cache, no-store, must-reanswer_valueidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
@@ -46,9 +36,9 @@ Session(app)
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///mental.db")
+questions = db.execute("SELECT * FROM questions")
 
 answers = []
-
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
@@ -56,20 +46,54 @@ def index():
     global answers
     answers = []
     if request.method == "POST":
-        
+        return render_template("index.html")
+    else:
+        return render_template("index.html")
+
+
+
+
+#----------------
+
+
+
+@app.route("/questionnare", methods=["GET", "POST"])
+@login_required
+def questionnare():
+    global answers
+    answers = []
+    if request.method == "POST":
         for q in questions:
             temp = []
-            for i in range(q[1]):
-                val = request.form.get(str(q[0])+str(i))
-                if val != "":
-                    temp.append(val)
-                #print(val)
+            for i in range(q['answer_spaces']):
+                answers = db.execute("SELECT * FROM answers WHERE user_id = ? AND question_id = ? AND answer_number=?", session['user_id'], q['id'],i)
+                answer_value = request.form.get(str(q['question'])+str(i))
+                temp.append(answer_value)
+                if len(answers)==0:
+                    print('01')
+                    db.execute('INSERT INTO answers (user_id, question_id,answer, answer_number) VALUES(?,? , ?, ?)',
+                    session["user_id"],
+                    q['id'],
+                    answer_value,
+                    i) 
+                else:
+                    db.execute('UPDATE answers SET answer=? WHERE id = ?',
+                    answer_value,
+                    answers[0]['id'])
+            
             answers.append(temp)
-        print(answers)
-        return render_template("paragraph.html")
+        return redirect("/")
     else:
-        return render_template("index.html",questions = questions)
+        text_fillers = []
+        for q in questions:
+            temp = []
+            for i in range(q['answer_spaces']):
+                answers = db.execute("SELECT * FROM answers WHERE user_id = ? AND question_id = ? AND answer_number = ?", session['user_id'], q['id'],i)
+                answer_value = answers[0]['answer']
+                temp.append(answer_value)
+            text_fillers.append(temp)
 
+        return render_template("questionnare.html",questions = questions, text_fillers = text_fillers)
 
 
 
@@ -102,7 +126,7 @@ def login():
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
             flash("invalid email and/or password")
             return render_template("login.html")
-            #return apology("invalid username and/or password", 403)
+            #return apology("inanswer_valueid username and/or password", 403)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -204,19 +228,39 @@ def paragraph():
     global txt
     global answers
     if request.method == "POST":
+        date = 'None'
+        date = request.args.get('date', default=0, type=str)
+        print('DATE:', date)
         txt = request.form.get("txt")
-        for i in range(len(answers)):
-            temp = []
-            for a in answers[i]:
-                if txt.count(a) > 0:
-                    temp.append([a,txt.count(a)])
-                else:
-                    print(a, 0)
-                    temp.append([a,f'<span style="color: #ff0000">{txt.count(a)}</span>'])
-            results.append([questions[i][0],temp])
-        return render_template('results.html', results = results, txt=txt,questions = questions)
+
+        db.execute('INSERT INTO posts (user_id, date,text) VALUES(? , ?,?)',
+            session['user_id'],
+            date,
+            txt)
+                
+        return render_template('index.html')
     else:
-        return render_template("paragraph.html")
+        date = 0
+        date = request.args.get('date', default=0, type=str)
+        print('DATE:', date)
+        txt = db.execute("SELECT * FROM posts WHERE user_id = ? AND date = ?", session['user_id'], date)
+        answers = db.execute("SELECT * FROM answers WHERE user_id = ?", session['user_id'])
+        
+        if len(txt) == 0:
+            txt = ''
+        else:
+            txt = txt[0]['text']
+
+        questions_and_answers = {}
+        lst = []
+        string = ''
+        for i in questions:
+            specific_answers = db.execute("SELECT * FROM answers WHERE user_id = ? and question_id = ?", session['user_id'],i['id'])
+            questions_and_answers[i['question']] = [i['answer'] for i in specific_answers if i['answer'] != 'None']
+            lst.append(i['question'])
+            string+=i["question"]+','
+
+        return render_template("paragraph.html", questions_str = string, answers=answers,questions_and_answers=questions_and_answers,txt=txt)
 
 
 def errorhandler(e):

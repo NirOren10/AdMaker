@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+<form action="/questionnare" method="post">
+  {% for q in questions %}
+  <h3>{{q['question']}}</h3>
+      {% for i in range(q['answer_spaces']) %}
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="{{q['question']}}{{i}}" value="{{text_fillers[questions.index(q)][i]}}" type="text">
+        </div>
+      {% endfor %}
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">submit</button>
+  </form>
+{% endblock %}

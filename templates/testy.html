@@ -1,25 +1,36 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendar</title>
+    <link rel="stylesheet" href="style.css" />
 
-{% block title %}
-    nope
-{% endblock %}
+  </head>
+  <body>
+    <div >
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="textBox" id = "textBox" type="text" 
+            style="width:100%;height:100%" rows="10" onkeyup="document.getElementById('printchatbox').innerHTML = inputBox.value;">
+        </div>
+    </div>
+    <div style="float:left;border-radius:15px;
+    background-color: #deddd9;
+    text-align: right;
+    height:auto;width:40%;padding:1%;margin:1%;text-align:left;" id = "printchatbox" class="printchatbox">
+    
+</div>
 
-{% block main %}
-    <div style="float:left; border-radius:15px;
-    background-color: lightblue;
-    text-align: center;
-    height:30em;width:70%;padding:5px;margin:5px";>
-        <h1>nonononobrainer</h1>
-    </div>
-    <div style="float:right;border-radius:15px;
-    background-color: lightblue;
-    text-align: center;
-    height:auto;width:28%;padding:5px;margin:5px;text-align:left;";>
-    {% for r in questions %}
-        <h3 style="margin-left:1em;">hhh</h3>
-        {% for a in range(3)%}
-            <h4 style="margin-left:2em;">lol sub</h4>    
-        {%endfor%}
-    {% endfor %}
-    </div>
-{% endblock %}
+  </body>
+  <footer>
+    <script>
+      var inputBox = document.getElementById('textBox');
+      document.getElementById('printchatbox').innerHTML = JSON.parse("sljn");
+      
+      inputBox.onkeyup = function(){
+          alert('ss')
+          document.getElementById('printchatbox').innerHTML = inputBox.value;
+      }
+    </script>
+  </footer>
+</html>

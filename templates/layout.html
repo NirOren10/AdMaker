@@ -3,7 +3,7 @@
 <html lang="en">
 
     <head>
-
+        {% block head %}{% endblock %}
         <meta charset="utf-8">
         <meta name="viewport" content="initial-scale=1, width=device-width">
 
@@ -21,6 +21,7 @@
 
         <title>C$50 Finance: {% block title %}{% endblock %}</title>
 
+
     </head>
 
     <body>
@@ -37,6 +38,13 @@
                     </ul>
                     <ul class="navbar-nav ml-auto mt-2">
                         <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                    </ul>
+                    <ul class="navbar-nav mr-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/questionnare">questionnare</a></li>
+                    </ul>
+                    
+                    <ul class="navbar-nav mr-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/paragraph">paragraph</a></li>
                     </ul>
                 {% else %}
                     <ul class="navbar-nav ml-auto mt-2">
