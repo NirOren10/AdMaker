@@ -5,32 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendar</title>
     <link rel="stylesheet" href="style.css" />
+    <style>
+     /* Created by XXX */
 
+.bracket{
+    color:orange;
+}
+textarea {
+ /* color : #fff;
+  background-color: #000000;*/
+}
+body{
+   margin:0px;
+   /* background:#000; */
+}
+form{
+    position:relative;
+}
+#back_buffer,
+#tex{
+    all:unset;
+    display:block;
+    position:absolute;
+    top:0px;
+    left:0px;
+    /* width:100vw;
+    height:100vh; */
+    font-size:16px;
+    font-family:arial;
+    border:none;
+    /* border:1px solid orange; */
+}
+#back_buffer{
+    /* background:black; */
+    z-index:1;
+    /* color:white; */
+}
+#tex{
+    z-index:10;
+    color:transparent;
+    background:transparent;
+    /* caret-color:white; */
+}
+
+    </style>
   </head>
   <body>
-    <div >
-        <div class="form-group">
-            <input autocomplete="off" autofocus class="textBox" id = "textBox" type="text" 
-            style="width:100%;height:100%" rows="10" onkeyup="document.getElementById('printchatbox').innerHTML = inputBox.value;">
-        </div>
-    </div>
-    <div style="float:left;border-radius:15px;
-    background-color: #deddd9;
-    text-align: right;
-    height:auto;width:40%;padding:1%;margin:1%;text-align:left;" id = "printchatbox" class="printchatbox">
     
-</div>
+  
+    <form oninput="change()"> 
+      <div id="back_buffer" style="height:100%; width:100%;"></div>
+      <input id="tex" placeholder="Type here">
+     </form> 
+     
 
   </body>
   <footer>
     <script>
-      var inputBox = document.getElementById('textBox');
-      document.getElementById('printchatbox').innerHTML = JSON.parse("sljn");
-      
-      inputBox.onkeyup = function(){
-          alert('ss')
-          document.getElementById('printchatbox').innerHTML = inputBox.value;
-      }
+      // Created by XXX
+
+function change() {
+  document.getElementById('tex').addEventListener('keyup', function(e){
+    window.caret = e.target.selectionStart
+  });
+  var x = tex.value;
+  var value;
+  var sl = x.slice(x.lastIndexOf("\n"));
+  var tab = "  ";
+  var cur = "";
+  if (sl.includes("  ")){
+  var tab = "  ";
+  if (sl.match(/  /g).length != null){
+    var tab = tab.repeat(sl.match(/  /g).length + 1);
+    cur += tab.repeat(sl.match(/  /g).length);
+  } else {
+    var tab = "  ";
+  }} else{
+    cur = ""
+  }
+  var lchar = x[tex.value.length - 1];
+  //console.log(tex.value[tex.value.length - 1])
+  document.getElementById('back_buffer').innerHTML=highlight(document.getElementById('tex').value);
+}
+
+
+
+
+function highlight(text){
+    // do something better than this 
+    tex_final=text.replace(/([\[\]\{\}\(\)])/gm,"<span class='bracket'>$1</span>").replace(/\n/gm,"<br>"); // brackets
+    return tex_final;
+}
+
     </script>
   </footer>
 </html>

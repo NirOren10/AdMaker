@@ -7,6 +7,8 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 # from django.utils import simplejson
+import random
+
 
 
 from helpers import apology, login_required, lookup, usd
@@ -51,10 +53,12 @@ def index():
         return render_template("index.html")
 
 
-
+color_list = []
+for i in range(20):
+    color = "%06x" % random.randint(0, 0xFFFFFF)
+    color_list.append(color)
 
 #----------------
-
 
 
 @app.route("/questionnare", methods=["GET", "POST"])
@@ -232,7 +236,7 @@ def paragraph():
         date = request.args.get('date', default=0, type=str)
         print('DATE:', date)
         txt = request.form.get("txt")
-
+        print(txt)
         db.execute('INSERT INTO posts (user_id, date,text) VALUES(? , ?,?)',
             session['user_id'],
             date,
@@ -245,22 +249,32 @@ def paragraph():
         print('DATE:', date)
         txt = db.execute("SELECT * FROM posts WHERE user_id = ? AND date = ?", session['user_id'], date)
         answers = db.execute("SELECT * FROM answers WHERE user_id = ?", session['user_id'])
-        
+        print(txt)
         if len(txt) == 0:
-            txt = ''
+            txt = 'Type Here'
         else:
             txt = txt[0]['text']
-
+        print(txt)
         questions_and_answers = {}
         lst = []
         string = ''
+        counter = 0
         for i in questions:
             specific_answers = db.execute("SELECT * FROM answers WHERE user_id = ? and question_id = ?", session['user_id'],i['id'])
             questions_and_answers[i['question']] = [i['answer'] for i in specific_answers if i['answer'] != 'None']
+            
             lst.append(i['question'])
             string+=i["question"]+','
-
-        return render_template("paragraph.html", questions_str = string, answers=answers,questions_and_answers=questions_and_answers,txt=txt)
+        for i in questions_and_answers.keys():
+            var = questions_and_answers[i]
+            for v in range(len(var)):
+                kk = var[v]
+                var[v] = [kk, color_list[counter]]
+                counter+=1
+            questions_and_answers[i] = var
+            # counter+=1
+        # print(questions_and_answers)
+        return render_template("paragraph.html", questions_str = string, answers=answers,questions_and_answers=questions_and_answers,txt=txt,color_list=color_list)
 
 
 def errorhandler(e):
